@@ -1,0 +1,17 @@
+smtpd.pl            : The main program, starting up a select based smtp server and daemonizing.
+MailWall.pm         : Look at MailWall.pm as a simple factory for MailWallSessions below.
+MailWallSession.pm  : For each smtp session a MailWallSession is used to hold the state for that session.
+                      smtpd.pl forwards events to the individual session. 
+MailWallDb.pm       : This package encapsulates all low level and sql access to the sqlite mailwall database.
+MailWallQueue.pm    : This package encapsulates the top level access to the on-disk queueuing, look at it as a
+                      MailWallMessage factory.
+MailWallMessage.pm  : A basic abstraction for on disk messages that allows adding messages to a database queue
+MessageIdFactory.pm : A package for creating unique message id's for messages.
+MailWallEventLog.pm : A basic abstraction on top of MailWallDb for logging events to the database.
+MailTemplates.pm    : A simple package with templates for the feedback e-mails. 
+CommandProcessor.pm : A package for the upper level processing of database administration commands.
+
+MailWallClient.pm  MailWallPeer.pm MailWallPerson.pm : Simple data classes.
+
+
+

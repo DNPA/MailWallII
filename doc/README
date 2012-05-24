@@ -1,0 +1,97 @@
+The first thing you need to do is create a configuration file named mailwall.conf.
+You can start off with puting this file in the todb directory of the source tree.
+
+The file should contain 'key=value' pairs (one per line, and should hold the 
+following fields:
+
+
+user		   The username of the user that mailwall-ii should run as.
+group		   The group name of the group that mailwall-ii should run as.
+database	   The path of the database, make sure this path is writable for the
+                     user the mailwall-ii system will run as.
+spooldir	   The path of the spool dir where the mailwall-ii system should
+                     queue its mail messages.
+basenet		   The base class B network part of our local network.
+defaultnet	   The most used class C subnet of the B net.
+netgroups	   This file contains group to C net mappings, an example is found in todb.
+topdomain          The main domain that mailwall-ii runs under
+ip                 The IP address that mailwall-ii will bind to.
+smarthost          The smarthost that mailwall-ii will forward its outgoing SMTP to.
+adminip            The ip of the admin system.
+adminuser          The unix name of the admin user.
+daemonize          Unless you are testing, this filed should be set to 'true'.
+
+The file can be moved to /etc/.
+
+After creating the above file and making sure the directory for the db file and the spool dir
+are owned by the specified user, go to the todb directory and run the database creation script
+mailaccounts2db.pl .
+
+This script will process a number of files suplied by the administration team, if any files are 
+missing have your administrator contact the authors of this script for info on how these files
+should be structured.
+
+When the database has been created, you should move the perl module files to an apropriate location,
+and start both forwarder.pl and smtpd.pl.
+
+The Mailwall-II system consists of 3 top level parts.
+
+1) A basic sendmail or postfix instalation not accesible from the workstations.
+2) A mailwall-ii smtp server for accepting and monitoring mail from the workstations.
+3) A forwarder for sending out acceptable mail to the basic mailserver.
+
+The forwarder has quite a simple task:
+
+* All mail in the forward queue is forwarded to the basic mailserver.
+* All mail in the hold queue for longer than 10 minutes is put in the forward queue.
+* All mail still in a queue after 8 days is deleted.
+* All outgoing mail is stripped of X- headers, thus removing info on internaly
+  used mail clients etc.
+
+The mailwall-ii smtp server has multiple functions:
+
+Filtering and queueing incomming mail.
+* Mail from unknown senders is rejected.
+* Mail from unknown clients is rejected.
+* Mail from known senders comming from known clients is accepted only if:
+  * The sender is explicitly bound to the client OR,
+  * The sender is marked as roaming.
+  * The client is marked as promisquous.
+* Mail to unknown recipients is put in a hold queue for manual confirmation.
+* Mail to known recipients is put in a delay queue for anti flood protection.
+* On flood detection the client is marked as trojanized and all mail in queues
+  from that client is put in the hold queue.
+* Promisquous clients are NOT flood protected (so be carefull defining promiscouous clients).
+* Mail containing binary content is put in the hold queue for manual confirmation.
+* Messages are send out to the sender if user action is required.
+
+Basic confirmation:
+* Mail in the hold and delay queue can be explicitly approved by replying to an e-mail
+  sent to the user leaving the subject line intact.
+* Unknown recipients can be added to the whitelist by replying to an e-mail
+  sent to the user leaving the subject line intact.
+
+
+Basic administration:
+* The administrator can do basic administration of the database using e-mail. The commands
+  are send in the subject of an e-mail to info@mailwall.local. 
+* For more info, send an e-mail to admin@mailwall.local from the admin user/client with
+  the subject 'HELP'.
+
+
+Please note that administration using the mail interface allows a subset of what is possible
+talking to the database itself with the sqlite3 tool. Some pointers:
+
+  sqlite2 /psth/to/mailaccounts.db
+
+  .tables
+
+  .schema system                     : The SMTP client machines.
+  .schema person                     : The unix accounts on the REAL mailserver.    
+  .schema systemuser                 : Who is explicitly expected to work from where.
+  .schema address                    : E-mail addresses of people and mailinglists.
+  .schema addressuser                : Who uses what e-mail address.
+  .schema peer                       : External recipients both validated an not validated.
+  .schema messagequeue               : All the message queues.
+  .schema eventlog                   : The eventlog.
+

@@ -1,0 +1,57 @@
+The MailWall-II database is a simple sqlite database used both by the forwarder and the smtpd part of the mailwall.
+This document gives a description of the tables in this database.
+
+system:          The system table contains some basic information on the systems on the local network that the smtpd process
+                 communicates with. The IP of machines on this local network are composed as follows:
+
+                   $CONF[basenet].<net>.<ip>
+
+                 So if the basenet is defined as "192.168", than for an IP 192.168.1.56 the net value will be 1 and the ip value 56.
+
+                 Next to the IP adress of the system, the system table contains two flags, 'promesq' and 'trojanized'. The first flag
+                 when set defines that each and every user defined may use this system to send e-mails from. The second flag
+                 when set defines that a flood protect mechanism has been triggered, and the system is most likely trojanized.
+
+person:          The person table defines individuals. An individual is defined by a unique unixname. Next to the unixname field, 
+                 a name field is defined for administration purposes only. There is a flag 'roaming' defined in the person table
+                 that when set defines that this user is allowed to send e-mail from any defined system on the network.
+
+systemuser:      The systemuser table defines explicitly what user can use what system to send e-mail from. It is a simple
+                 coupling table, coupling a single systems to a single persons one at a time, thus allowing that (non roaming) 
+                 person to send  e-mail from that (non promisquous) system explicitly.
+
+address:         The address table defines all the e-mail addresses used by persons on the network. An address has the form 
+        
+                   <username>@<domain>
+
+                 Next to the username and domain fields, an address record also has two flags. The 'list' flag defines that the
+                 e-mail address is not private to a single user, but is the address of a mailinglist. The flag 'shared' defines
+                 that this mailinglist address is usable by all of its members as "From" address.
+
+addressuser:     The addressuser table defines what person user what e-mail address. This table is a simple coupling table,
+                 coupling a person to an e-mail address one at a time. There are multiple possibilities, defined by the flags
+                 of the address that determine how this table is used for that address. If an address has its 'list' flag set
+                 to false, than the addressuser record implies that the user is the sole owner of the given address. If the
+                 flag is set to true, than the user is simply a member of the mailinglist. If next to this the 'shared' flag
+                 of the address is set to true, than the user is allowed to use the mailinglist address as if it was its personal
+                 address.
+
+peer:            The peer table defines confirmed and unconfirmed non local target adresses. Like in the address table, the
+                 addresses are defined as:
+
+                    <username>@<domain>
+
+                 Next to username and domain, a peer record has an owner field that references the person that first introduced
+                 the peer to the system. It has a creationtime field that defines when the peer address was first introduced.
+                 Finaly it has a flag 'confirmed'. This flag will initially be set to false, until a user explicitly confirms
+                 the peer, at what time auto traversel of mail to this peer of non suspect messages will be allowed by the system.
+
+eventlog:        The eventlog table contains event strings (event) and timestamps (eventtime) of important recent events. If
+                 during the event a system and/or user were defined, these are recorded in system_id and person_id.
+
+messagequeue:    The messageque table contains all the queues of unsend messages. The 'queuename' field defines the queue that
+                 the message resides in.  Each message created gets an unique id (msgid) , and an unique storage location
+                 (fspath), but there may be multiple records for a message with a different 'recipient'.  On creation of a
+                 record in the massagequeue, the 'creationtime' is stored. The system that the message was received from and
+                 the person who send it are stored in the system_id field referencing the system table, and in the person_id
+                 field referencing the person table.  

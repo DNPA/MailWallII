@@ -1,0 +1,20 @@
+#!/bin/sh
+case "$1" in
+    start)
+	/opt/mailwall/bin/smtpd.pl
+	;;
+    stop)
+	kill `cat /var/run/smtpd.pid`
+	;;
+    restart)
+	$0 stop
+	$0 start
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
+esac
+
+exit 0
+

@@ -1,0 +1,31 @@
+HELP                              :  Returns this text.
+PERSON LIST                       :  Returns a list of defined persons in the database.
+PERSON LIST ROAMING               :  Same as 'PERSON LIST', but returns only roaming users.
+PERSON NEW <unixname> <fullname>  :  Creates a new person record.
+PERSON ROAMING <unixname>         :  Sets a person roaming flag to true.
+PERSON NO ROAMING <unixname>      :  Sets a person roaming flag to false.
+SYSTEM LIST                       :  Returns a list of all system records.
+SYSTEM LIST COMP                  :  Same as 'SYSTEM LIST', but only returns systems marked as compromized.
+SYSTEM LIST PROM                  :  Same as 'SYSTEM LIST', but only returns systems marked as promisquous.
+SYSTEM NEW <netnum> <hostnum>     :  Created a new system record.
+SYSTEM CLEAR <netnum> <hostnum>   :  Sets a system compromized flag to false.
+SYSTEM PROM <netnum> <hostnum>    :  Sets a system promisquous flag to true.
+SYSTEM NO PROM <netnum> <hostnum> :  Sets a system promisquous flag to false.
+ADDRESS LIST <unixname>           :  Returns a list of adresses defined for a given person.
+ADDRESS ADD <unixname> <address>  :  Add an e-mail address for a given person.
+ADDRESS DEL <address>             :  Remove an e-mail address.
+LIST LIST                         :  Returns a list of all defined mailinglists.
+LIST NEW  <address>               :  Creates a new mailinglist record.
+LIST ADD <unixname> <address>     :  Add a user to a mailinglist. (Note: ONLY relevant if list may be set to shared)
+LIST SHARED <address>             :  Set the shared flag for the list to 'true', meaning it can be used as From: address
+                                     by its members.
+LIST NO SHARED <address>          :  Set the shared flag for the list to 'false'.
+QUEUE LIST                        :  Returns the names of the queues.
+QUEUE LIST <queuename>            :  Lists all messages in a given queu.
+QUEUE MOVE <que1> <msgid> <que2>  :  Move a given message from one queue to an other.
+QUEUE DEL  <msgid>                :  Remove a message from all queues.
+EVENT LIST                        :  List all system/person combination involved in events.
+EVENT LIST PERSON <unixname>      :  List all events involving a given user.
+EVENT LIST PERSON NON             :  List all events that don't have a specific user atached to them.
+EVENT LIST SYSTEM <net> <host>    :  List all events involving a given host.
+EVENT LIST SYSTEM OTHER           :  List all events not involving a known host.
